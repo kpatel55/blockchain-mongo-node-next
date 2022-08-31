@@ -1,8 +1,13 @@
 import { TabContext, TabList, TabPanel } from "@mui/lab";
-import { Box, Button, Tab, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Container,
+  Tab,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { useFormik } from "formik";
-import { NextPage } from "next";
-import { useRouter } from "next/router";
 import { useState } from "react";
 import * as Yup from "yup";
 import { useUserContext } from "../contexts/UserContext";
@@ -20,17 +25,9 @@ type RegisterFormValues = {
   lastName: string;
 };
 
-const Login: NextPage = () => {
-  const {
-    loading,
-    setLoading,
-    authenticated,
-    setAuthenticated,
-    currentUser,
-    setCurrentUser,
-  } = useUserContext();
+export const Login = () => {
+  const { setLoading, setAuthenticated, setCurrentUser } = useUserContext();
   const [tabVal, setTabVal] = useState<string>("login");
-  const router = useRouter();
 
   const formikLogin = useFormik<LoginFormValues>({
     initialValues: {
@@ -42,11 +39,6 @@ const Login: NextPage = () => {
         .max(20, "Must be 20 characters or less")
         .required("Required"),
       password: Yup.string().required("Required"),
-      // .min(8, "Must be 8 characters or more")
-      // .matches(/[a-z]+/, "One lowercase character")
-      // .matches(/[A-Z]+/, "One uppercase character")
-      // .matches(/[@$!%*#?&]+/, "One special character")
-      // .matches(/\d+/, "One number"),
     }),
     onSubmit: () => {
       setLoading(true);
@@ -54,7 +46,6 @@ const Login: NextPage = () => {
         setAuthenticated(true);
         setCurrentUser(currentUser);
         setLoading(false);
-        router.push("/");
       };
       api.user.login(
         formikLogin.values.username,
@@ -109,7 +100,7 @@ const Login: NextPage = () => {
   };
 
   return (
-    <Box>
+    <Container>
       <TabContext value={tabVal}>
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
           <TabList onChange={handleChange} centered>
@@ -120,10 +111,10 @@ const Login: NextPage = () => {
         <TabPanel value="login">
           <form onSubmit={formikLogin.handleSubmit}>
             <Box sx={{ my: 3 }}>
-              <Typography variant="h4" color="primary.dark">
+              <Typography variant="h4" color="primary.main">
                 Login
               </Typography>
-              <Typography variant="h6" color="primary.dark" py="1rem">
+              <Typography variant="h6" color="primary.main" py="1rem">
                 Sign in using your existing account.
               </Typography>
             </Box>
@@ -171,10 +162,11 @@ const Login: NextPage = () => {
                 type="submit"
                 disabled={formikLogin.isSubmitting}
                 sx={{
-                  bgcolor: "rgb(0, 0, 0)",
+                  bgcolor: "primary.main",
+                  color: "#FFFFFF",
                   py: "1rem",
                   "&:hover": {
-                    bgcolor: "rgb(0, 0, 0)",
+                    bgcolor: "primary.main",
                   },
                 }}
               >
@@ -186,16 +178,16 @@ const Login: NextPage = () => {
         <TabPanel value="register">
           <form onSubmit={formikRegister.handleSubmit}>
             <Box sx={{ my: 3 }}>
-              <Typography variant="h4" color="primary.dark">
+              <Typography variant="h4" color="primary.main">
                 Register
               </Typography>
-              <Typography variant="h6" color="primary.dark" py="1rem">
+              <Typography variant="h6" color="primary.main" py="1rem">
                 Sign up for a new account.
               </Typography>
             </Box>
             <Box
               width="100%"
-              sx={{ display: "flex", justifyContent: "space-between" }}
+              sx={{ display: "flex", justifyContent: "space-between", mb: 3 }}
             >
               <TextField
                 label="Username"
@@ -252,6 +244,7 @@ const Login: NextPage = () => {
                   formikRegister.errors.firstName
               )}
               fullWidth
+              sx={{ mb: 3 }}
             />
             <TextField
               label="Last Name"
@@ -278,10 +271,11 @@ const Login: NextPage = () => {
                 type="submit"
                 disabled={formikRegister.isSubmitting}
                 sx={{
-                  bgcolor: "rgb(0, 0, 0)",
+                  bgcolor: "primary.main",
+                  color: "#FFFFFF",
                   py: "1rem",
                   "&:hover": {
-                    bgcolor: "rgb(0, 0, 0)",
+                    bgcolor: "primary.main",
                   },
                 }}
               >
@@ -291,8 +285,6 @@ const Login: NextPage = () => {
           </form>
         </TabPanel>
       </TabContext>
-    </Box>
+    </Container>
   );
 };
-
-export default Login;

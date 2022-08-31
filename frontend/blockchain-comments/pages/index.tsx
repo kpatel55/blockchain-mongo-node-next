@@ -2,15 +2,14 @@ import type { NextPage } from "next";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
-import Link from "../utils/Link";
 import { useUserContext } from "../contexts/UserContext";
-import { useRouter } from "next/router";
 import { Button, Divider, TextField } from "@mui/material";
 import api from "../services/api";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useEffect, useState } from "react";
-import { string } from "yup/lib/locale";
+import { Login } from "../components/login";
+import { HomeNav } from "../components/Nav";
 
 type FormValues = {
   comment: string;
@@ -25,7 +24,6 @@ interface Comment {
 const Home: NextPage = () => {
   const { authenticated, setLoading } = useUserContext();
   const [refetch, setRefetch] = useState<boolean>(false);
-  const router = useRouter();
   const [comments, setComments] = useState<Comment[] | null>(null);
 
   const formik = useFormik<FormValues>({
@@ -48,98 +46,99 @@ const Home: NextPage = () => {
   });
 
   useEffect(() => {
-    if (!authenticated) {
-      router.push("/login");
-    }
-  }, [authenticated]);
-
-  useEffect(() => {
     const getAllComments = async () => {
-      const commentsList = await api.comment.getComments();
-      setComments(commentsList as Comment[]);
+      if (authenticated) {
+        const commentsList = await api.comment.getComments();
+        setComments(commentsList as Comment[]);
+      }
     };
     getAllComments();
-  }, [refetch]);
-
-  const handleClick = () => {
-    api.user.logout();
-    router.push("/login");
-  };
+  }, [refetch, authenticated]);
 
   return (
-    <Container maxWidth="lg">
-      {authenticated && (
-        <Box
-          sx={{
-            my: 4,
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <Button
-            onClick={handleClick}
-            sx={{
-              bgcolor: "#000",
-              color: "#FFF",
-              mx: 5,
-              fontSize: "11px",
-              "&:hover": {
-                bgcolor: "#2b2626",
-                color: "#FFF",
-              },
-            }}
-          >
-            Log out
-          </Button>
-
-          <form onSubmit={formik.handleSubmit}>
-            <TextField
-              fullWidth
-              multiline
-              rows={4}
-              label="Store a comment on the blockchain"
-              name="comment"
-              variant="outlined"
-              color="secondary"
-              margin="normal"
-              value={formik.values.comment}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              helperText={formik.touched.comment && formik.errors.comment}
-              error={Boolean(formik.touched.comment && formik.errors.comment)}
-            />
-            <Box sx={{ py: 3 }}>
-              <Button
-                fullWidth
-                type="submit"
-                disabled={formik.isSubmitting}
-                sx={{
-                  bgcolor: "rgb(0, 0, 0)",
-                  py: "1rem",
-                  "&:hover": {
-                    bgcolor: "rgb(0, 0, 0)",
-                  },
-                }}
+    <>
+      {authenticated ? (
+        <Box>
+          <HomeNav />
+          <Container sx={{ pt: 12 }}>
+            <Box
+              sx={{
+                my: 4,
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Typography
+                variant="h3"
+                color="primary.main"
+                sx={{ alignSelf: "flex-start" }}
               >
-                Submit
-              </Button>
+                Add a Comment to the Blockchain!
+              </Typography>
+              <form onSubmit={formik.handleSubmit} style={{ width: "100%" }}>
+                <TextField
+                  fullWidth
+                  multiline
+                  rows={4}
+                  label="Comment..."
+                  name="comment"
+                  variant="outlined"
+                  color="secondary"
+                  margin="normal"
+                  value={formik.values.comment}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  helperText={formik.touched.comment && formik.errors.comment}
+                  error={Boolean(
+                    formik.touched.comment && formik.errors.comment
+                  )}
+                />
+                <Box sx={{ py: 3, width: "25%" }}>
+                  <Button
+                    fullWidth
+                    type="submit"
+                    disabled={formik.isSubmitting}
+                    sx={{
+                      bgcolor: "primary.main",
+                      color: "#FFFFFF",
+                      py: "1rem",
+                      "&:hover": {
+                        bgcolor: "primary.main",
+                      },
+                    }}
+                  >
+                    Submit
+                  </Button>
+                </Box>
+              </form>
+              {comments &&
+                comments.map((comment) => (
+                  <Box key={comment.ID} sx={{ width: "100%" }}>
+                    <Divider />
+                    <Typography sx={{ fontSize: "18px", mt: 3, mb: 2 }}>
+                      {comment.Comment}
+                    </Typography>
+                    <Typography
+                      sx={{
+                        font: "15px Inconsolata",
+                        color: "rgb(0 0 0 / 60%)",
+                        mb: 3,
+                      }}
+                    >
+                      - {comment.Author}
+                    </Typography>
+                    <Divider />
+                  </Box>
+                ))}
             </Box>
-          </form>
-          {comments &&
-            comments.map((comment) => (
-              <Box key={comment.ID}>
-                <Divider />
-                <Typography>
-                  {comment.Comment} by {comment.Author}
-                </Typography>
-                <Divider />
-              </Box>
-            ))}
+          </Container>
         </Box>
+      ) : (
+        <Login />
       )}
-    </Container>
+    </>
   );
 };
 

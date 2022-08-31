@@ -32,8 +32,6 @@ const api = {
       lastName: string,
       callback: any
     ) => {
-      // const userCookie = cookies.get("user-auth");
-      // const token = userCookie.user.token;
       const url = "http://localhost:8081/users/register";
 
       const options = {

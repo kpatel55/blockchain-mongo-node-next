@@ -41,6 +41,7 @@ export default function UserProvider(props: Props) {
       if (userCookie) {
         jwt = !!userCookie.user.token;
         setAuthenticated(true);
+        setCurrentUser(userCookie.user);
       }
       if (!jwt) {
         cookies.remove("user-auth", { path: "/" });
