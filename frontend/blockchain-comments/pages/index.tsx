@@ -8,7 +8,7 @@ import api from "../services/api";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useEffect, useState } from "react";
-import { Login } from "../components/login";
+import { Login } from "../components/Login";
 import { HomeNav } from "../components/Nav";
 
 type FormValues = {

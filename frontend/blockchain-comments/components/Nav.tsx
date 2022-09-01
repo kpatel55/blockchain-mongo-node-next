@@ -33,7 +33,7 @@ function HiddenNav(props: Props) {
 }
 
 const HomeNavRoot = styled(AppBar)(({ theme }) => ({
-  backgroundColor: "#e44c50",
+  backgroundColor: "#4B6587",
   color: "#FFF",
   boxShadow: "none",
   display: "flex",
@@ -56,8 +56,12 @@ export const HomeNav = () => {
         <Box>
           <HomeNavRoot position="fixed">
             <Toolbar disableGutters sx={{ px: "3.6%" }}>
-              <Typography variant="h5" color="#FFF" sx={{ flex: 1 }}>
-                {currentUser?.username}
+              <Typography
+                variant="h5"
+                color="#FFF"
+                sx={{ flex: 1, fontWeight: "500" }}
+              >
+                {currentUser?.firstName} {currentUser?.lastName}
               </Typography>
               <Button
                 onClick={handleClick}
