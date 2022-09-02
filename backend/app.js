@@ -82,6 +82,7 @@ app.get("/comments/:user", async (req, res) => {
 app.post("/comment", async (req, res) => {
   const data = req.body;
   const userId = uuid();
+  const timestamp = new Date(Date.now()).toISOString();
   const user = data.author || "";
   const userComment = data.comment || "";
 
@@ -133,7 +134,8 @@ app.post("/comment", async (req, res) => {
       "CreateComment",
       userId,
       user,
-      userComment
+      userComment,
+      timestamp
     );
     result = JSON.parse(result);
     console.log("Response from blockchain:", result);

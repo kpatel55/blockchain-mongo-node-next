@@ -4,7 +4,12 @@ const cookies = new Cookies();
 
 const api = {
   user: {
-    login: async (username: string, password: string, callback: any) => {
+    login: async (
+      username: string,
+      password: string
+      // successCallback: any,
+      // errorCallback: any
+    ) => {
       const url = "http://localhost:8081/users/authenticate";
       const options = {
         method: "POST",
@@ -22,15 +27,17 @@ const api = {
 
       if (res.status === 200) {
         cookies.set("user-auth", { user: currentUser }, { path: "/" });
-        callback(currentUser);
+        return currentUser;
       }
+      throw new Error("Not a registered user!");
     },
     register: async (
       username: string,
       password: string,
       firstName: string,
       lastName: string,
-      callback: any
+      successCallback: any,
+      errorCallback: any
     ) => {
       const url = "http://localhost:8081/users/register";
 
@@ -50,7 +57,9 @@ const api = {
       const res = await fetch(url, options);
 
       if (res.status === 200) {
-        callback();
+        successCallback();
+      } else {
+        errorCallback();
       }
     },
     logout: () => {

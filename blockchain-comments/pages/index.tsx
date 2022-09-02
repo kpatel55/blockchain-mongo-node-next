@@ -3,7 +3,13 @@ import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import { useUserContext } from "../contexts/UserContext";
-import { Button, Divider, TextField } from "@mui/material";
+import {
+  Backdrop,
+  Button,
+  CircularProgress,
+  Divider,
+  TextField,
+} from "@mui/material";
 import api from "../services/api";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -19,10 +25,11 @@ interface Comment {
   Author: string;
   Comment: string;
   ID: string;
+  CreatedAt: string;
 }
 
 const Home: NextPage = () => {
-  const { authenticated, setLoading } = useUserContext();
+  const { authenticated, loading, setLoading } = useUserContext();
   const [refetch, setRefetch] = useState<boolean>(false);
   const [comments, setComments] = useState<Comment[] | null>(null);
 
@@ -40,6 +47,7 @@ const Home: NextPage = () => {
       const successCallback = () => {
         formik.resetForm();
         setRefetch(!refetch);
+        setLoading(false);
       };
       api.comment.addComment(formik.values.comment, successCallback);
     },
@@ -48,8 +56,10 @@ const Home: NextPage = () => {
   useEffect(() => {
     const getAllComments = async () => {
       if (authenticated) {
+        setLoading(true);
         const commentsList = await api.comment.getComments();
         setComments(commentsList as Comment[]);
+        setLoading(false);
       }
     };
     getAllComments();
@@ -59,6 +69,12 @@ const Home: NextPage = () => {
     <>
       {authenticated ? (
         <Box>
+          <Backdrop
+            sx={{ color: "#FFF", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+            open={loading}
+          >
+            <CircularProgress sx={{ color: "#FFF" }} />
+          </Backdrop>
           <HomeNav />
           <Container sx={{ pt: 12 }}>
             <Box
@@ -127,7 +143,8 @@ const Home: NextPage = () => {
                         mb: 3,
                       }}
                     >
-                      - {comment.Author}
+                      - {comment.Author} on{" "}
+                      {new Date(comment.CreatedAt).toLocaleString()}
                     </Typography>
                     <Divider />
                   </Box>

@@ -1,8 +1,10 @@
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import {
+  Alert,
   Box,
   Button,
   Container,
+  Snackbar,
   Tab,
   TextField,
   Typography,
@@ -28,6 +30,8 @@ type RegisterFormValues = {
 export const Login = () => {
   const { setLoading, setAuthenticated, setCurrentUser } = useUserContext();
   const [tabVal, setTabVal] = useState<string>("login");
+  const [loginError, setLoginError] = useState<boolean>(false);
+  const [registerSuccess, setRegisterSuccess] = useState<boolean>(false);
 
   const formikLogin = useFormik<LoginFormValues>({
     initialValues: {
@@ -40,18 +44,37 @@ export const Login = () => {
         .required("Required"),
       password: Yup.string().required("Required"),
     }),
-    onSubmit: () => {
+    onSubmit: async () => {
       setLoading(true);
-      const successCallback = (currentUser: any) => {
-        setAuthenticated(true);
-        setCurrentUser(currentUser);
-        setLoading(false);
-      };
-      api.user.login(
-        formikLogin.values.username,
-        formikLogin.values.password,
-        successCallback
-      );
+      api.user
+        .login(formikLogin.values.username, formikLogin.values.password)
+        .then((currentUser) => {
+          setAuthenticated(true);
+          setCurrentUser(currentUser);
+        })
+        .catch((error) => {
+          formikLogin.resetForm();
+          setLoginError(true);
+        })
+        .finally(() => setLoading(false));
+
+      // setLoading(true);
+      // const successCallback = (currentUser: any) => {
+      //   setAuthenticated(true);
+      //   setCurrentUser(currentUser);
+      //   setLoading(false);
+      // };
+      // const errorCallback = () => {
+      //   formikLogin.resetForm();
+      //   setLoginError(true);
+      //   setLoading(false);
+      // };
+      // api.user.login(
+      //   formikLogin.values.username,
+      //   formikLogin.values.password,
+      //   successCallback,
+      //   errorCallback
+      // );
     },
   });
 
@@ -81,22 +104,42 @@ export const Login = () => {
         .required("Required"),
     }),
     onSubmit: () => {
+      setLoading(true);
       const successCallback = () => {
         formikRegister.resetForm();
         setTabVal("login");
+        setRegisterSuccess(true);
+        setLoading(false);
+      };
+      const errorCallback = () => {
+        formikRegister.resetForm();
+        setLoading(false);
       };
       api.user.register(
         formikRegister.values.username,
         formikRegister.values.password,
         formikRegister.values.firstName,
         formikRegister.values.lastName,
-        successCallback
+        successCallback,
+        errorCallback
       );
     },
   });
 
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
     setTabVal(newValue);
+  };
+
+  const handleClose = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setLoginError(false);
+    setRegisterSuccess(false);
   };
 
   return (
@@ -285,6 +328,26 @@ export const Login = () => {
           </form>
         </TabPanel>
       </TabContext>
+      <Snackbar
+        open={loginError}
+        autoHideDuration={6000}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert onClose={handleClose} severity="error" sx={{ width: "100%" }}>
+          Unable to login, try again.
+        </Alert>
+      </Snackbar>
+      <Snackbar
+        open={registerSuccess}
+        autoHideDuration={6000}
+        onClose={handleClose}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert onClose={handleClose} severity="success" sx={{ width: "100%" }}>
+          Successfully Registered!
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };
