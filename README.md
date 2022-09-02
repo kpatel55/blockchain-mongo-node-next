@@ -4,6 +4,16 @@ A simple blockchain app for storing comments.
 
 ## Usage
 
+Be sure to have Docker installed and running locally prior to running scripts.
+
+In the /backend folder, be sure to run npm install, and create a .env file based on your local environment:
+
+```
+PORT=[my_port]
+MONGODB_URI=[my_mongo_uri]
+MONGODB_SECRET=[my_mongo_secret]
+```
+
 ### Deployment
 
 Run the startup script to start the blockchain network and express API
