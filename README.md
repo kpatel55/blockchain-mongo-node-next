@@ -25,13 +25,19 @@ npm run dev
 ### Explorer
 
 http://localhost:8080/#/login
+
 user: exploreradmin
+
 pw: exploreradminpw
 
 ### State CouchDB
 
 http://localhost:5984/\_utils/#login
+
 user: admin
+
 pw: adminpw
 
-To clean resources when you're done, run the cleanup script.
+### Clean Up
+
+To teardown resources when you're done, run the clean up script.
